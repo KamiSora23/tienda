@@ -15,7 +15,10 @@ export function MailSettings({ token, notify, platform = false }: { token: strin
   const [testTo, setTestTo] = useState("");
   const [busy, setBusy] = useState<"" | "save" | "test">("");
   const [readOnly, setReadOnly] = useState(false); // superadministrador en solo lectura dentro de la empresa
-  const blocked = (x: any) => { if (!platform && x?.status === 403) setReadOnly(true); notify(x.message); };
+  const [result, setResult] = useState<{ ok: boolean; text: string } | null>(null); // queda escrito en el formulario
+  const blocked = (x: any) => { if (!platform && x?.status === 403) setReadOnly(true); setResult({ ok: false, text: x.message }); notify(x.message); };
+  // Tras probar solo se actualiza el resultado de la prueba: recargar todo borraba lo escrito sin guardar.
+  const refreshTest = () => api(base, token).then((d: Settings) => setS((cur) => (cur ? { ...cur, last_test_at: d.last_test_at, last_test_ok: d.last_test_ok, last_error: d.last_error } : d))).catch(() => {});
 
   const load = () => api(base, token).then(setS).catch((e) => notify(e.message));
   useEffect(() => { load(); }, [token]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -28,11 +31,11 @@ export function MailSettings({ token, notify, platform = false }: { token: strin
 
   const save = async (e: React.FormEvent) => {
     e.preventDefault(); setBusy("save");
-    try { const r = await api(base, token, { method: "PUT", body: JSON.stringify(payload()) }); notify(r?.message ?? "Correo guardado"); setPassword(""); await load(); } catch (x: any) { blocked(x); } finally { setBusy(""); }
+    try { await api(base, token, { method: "PUT", body: JSON.stringify(payload()) }); const text = s.enabled ? "Guardado y activo: los correos saldrán desde " + s.from_address + "." : "Guardado, pero desactivado: marca «" + (platform ? "Usar esta configuración" : "Usar el correo propio de la empresa") + "» y vuelve a guardar para usarlo."; setResult({ ok: true, text }); notify("Correo guardado"); setPassword(""); await load(); } catch (x: any) { blocked(x); } finally { setBusy(""); }
   };
   const test = async () => {
     setBusy("test");
-    try { await api(`${base}/test`, token, { method: "POST", body: JSON.stringify({ ...payload(), to: testTo || null }) }); notify("Correo de prueba enviado. Revisa la bandeja (y spam)."); await load(); } catch (x: any) { blocked(x); await load(); } finally { setBusy(""); }
+    try { await api(`${base}/test`, token, { method: "POST", body: JSON.stringify({ ...payload(), to: testTo || null }) }); setResult({ ok: true, text: "Correo de prueba enviado. Revisa la bandeja (y spam). Si llegó, pulsa «Guardar correo»: la prueba no guarda los datos." }); notify("Correo de prueba enviado"); await refreshTest(); } catch (x: any) { blocked(x); await refreshTest(); } finally { setBusy(""); }
   };
 
   return (
@@ -69,6 +72,7 @@ export function MailSettings({ token, notify, platform = false }: { token: strin
       </div>
       {s.last_test_at && <p className={`mail-status ${s.last_test_ok ? "ok" : "bad"}`}>{s.last_test_ok ? "✓ Última prueba correcta" : `✗ Última prueba fallida: ${s.last_error ?? ""}`} · {new Date(s.last_test_at.replace(" ", "T")).toLocaleString("es-PE")}</p>}
       <p className="settings-help">La contraseña se guarda cifrada y nunca se vuelve a mostrar. Puedes probar antes de guardar.</p>
+      {result && <p className={`mail-status ${result.ok ? "ok" : "bad"}`} role="status">{result.ok ? "✓ " : "✗ "}{result.text}</p>}
       <footer><button className="primary" disabled={!!busy}>{busy === "save" ? "Guardando…" : "Guardar correo"}</button></footer>
     </form>
   );
