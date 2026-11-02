@@ -62,6 +62,21 @@ class InstallCommandTest extends TestCase
         $this->assertSame('20123456789', DB::table('companies')->value('ruc'));
     }
 
+    public function test_a_password_can_be_changed_from_the_console_and_unlocks_the_user(): void
+    {
+        $this->install()->assertSuccessful();
+        User::where('email', 'ana@mitienda.test')->update(['failed_login_attempts' => 5, 'locked_until' => now()->addMinutes(15)]);
+
+        $this->artisan('user:password', ['email' => 'ana@mitienda.test'])
+            ->expectsQuestion('Nueva contraseña para ana@mitienda.test (mínimo 10 caracteres)', 'corta')
+            ->expectsQuestion('Nueva contraseña para ana@mitienda.test (mínimo 10 caracteres)', 'OtraClave123')
+            ->expectsQuestion('Repite la contraseña', 'OtraClave123')
+            ->assertSuccessful();
+
+        $this->postJson('/api/v1/login', ['email' => 'ana@mitienda.test', 'password' => 'OtraClave123'])->assertOk()->assertJsonStructure(['data' => ['token']]);
+        $this->artisan('user:password', ['email' => 'nadie@mitienda.test'])->assertFailed();
+    }
+
     public function test_it_does_nothing_when_companies_already_exist(): void
     {
         $this->install()->assertSuccessful();

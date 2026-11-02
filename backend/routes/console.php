@@ -18,6 +18,24 @@ Artisan::command('user:promote-platform {email}', function (string $email) {
     return 0;
 })->purpose('Promueve explícitamente un usuario existente para administrar respaldos globales');
 
+// Cambiar la contraseña de un usuario desde el servidor (la pregunta oculta) y desbloquearlo.
+Artisan::command('user:password {email}', function (string $email) {
+    $user=\App\Models\User::where('email',$email)->first();
+    if(!$user){$this->error('No existe un usuario con ese correo.');return 1;}
+    $min=$user->role==='platform_admin'?12:10;
+    for($i=0;$i<5;$i++){
+        $password=(string)$this->secret("Nueva contraseña para {$email} (mínimo {$min} caracteres)");
+        if(mb_strlen($password)<$min){$this->error("Debe tener al menos {$min} caracteres.");continue;}
+        if($password!==(string)$this->secret('Repite la contraseña')){$this->error('Las contraseñas no coinciden.');continue;}
+        $user->update(['password'=>$password,'failed_login_attempts'=>0,'locked_until'=>null]);
+        DB::table('user_sessions')->where('user_id',$user->id)->delete();
+        DB::table('audit_events')->insert(['uuid'=>\Illuminate\Support\Str::uuid(),'company_id'=>$user->company_id,'user_id'=>$user->id,'by_platform'=>$user->role==='platform_admin','event'=>'user.password_changed','entity'=>'users','entity_id'=>$user->id,'after'=>json_encode(['via'=>'consola']),'created_at'=>now(),'updated_at'=>now()]);
+        $this->info('Contraseña cambiada. Se cerraron sus sesiones abiertas y se desbloqueó el usuario.');
+        return 0;
+    }
+    return 1;
+})->purpose('Cambia la contraseña de un usuario (pregunta oculta) y lo desbloquea');
+
 // Código de verificación nuevo para un usuario (por ejemplo, si el correo no llega). Requiere acceso al servidor.
 Artisan::command('user:login-code {email}', function (string $email) {
     $user=\App\Models\User::where('email',$email)->first();

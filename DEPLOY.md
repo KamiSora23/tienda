@@ -140,6 +140,7 @@ docker compose logs -f api                 # errores de la API
 docker compose exec api php artisan mail:test tu-correo@gmail.com
 docker compose exec api php artisan user:promote-platform correo@ejemplo.com
 docker compose exec api php artisan user:login-code correo@ejemplo.com   # si el código no llega
+docker compose exec api php artisan user:password correo@ejemplo.com     # cambiar contraseña y desbloquear
 docker compose exec db mysqldump -u root -p deurstore > respaldo.sql      # respaldo manual
 docker compose down                        # detener (los datos se conservan)
 ```
