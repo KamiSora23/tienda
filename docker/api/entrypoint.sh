@@ -3,13 +3,18 @@
 set -e
 cd /var/www/html
 
+# Generar la clave no necesita base de datos ni APP_KEY: se ejecuta directo.
+case "$*" in
+  *key:generate*) exec "$@" ;;
+esac
+
 # Las carpetas de storage viven en un volumen: se crean si es la primera vez.
 mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views storage/logs storage/app/private storage/app/public
 chown -R www-data:www-data storage bootstrap/cache
 
 if [ -z "$APP_KEY" ]; then
   echo "ERROR: falta APP_KEY en el archivo .env. Genérala con:"
-  echo "  docker compose run --rm api php artisan key:generate --show"
+  echo "  docker compose run --rm --no-deps api php artisan key:generate --show"
   exit 1
 fi
 
