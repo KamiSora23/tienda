@@ -57,7 +57,9 @@ class PlatformSafeguardsTest extends TestCase
     {
         // SMTP inalcanzable (como una contraseña de Gmail errónea o sin internet).
         config(['mail.default' => 'smtp', 'mail.mailers.smtp.host' => '127.0.0.1', 'mail.mailers.smtp.port' => 1, 'mail.mailers.smtp.timeout' => 2]);
-        $this->postJson('/api/v1/login', ['email' => 'super@example.test', 'password' => 'Super12345'])->assertStatus(503);
+        // Fuera de local: se abre la pantalla del código (para usar user:login-code), sin mostrar el código.
+        $this->postJson('/api/v1/login', ['email' => 'super@example.test', 'password' => 'Super12345'])
+            ->assertOk()->assertJsonPath('data.two_factor_required', true)->assertJsonPath('data.mail_failed', true)->assertJsonMissingPath('data.dev_code');
 
         $this->travel(61)->seconds();
         $this->app['env'] = 'local';

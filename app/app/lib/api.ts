@@ -21,6 +21,8 @@ const STATUS_MESSAGES: Record<number, string> = {
 // Los errores 5xx pueden traer el texto interno de la excepción (SQL, rutas de
 // archivos) cuando APP_DEBUG está activo; nunca se muestran al usuario.
 export function errorMessage(status: number, body: any): string {
+  // 503 lleva mensajes propios del sistema (p. ej. «el sistema está en mantenimiento»); el resto de 5xx no se muestra.
+  if (status === 503 && typeof body?.message === "string" && body.message.length < 300) return body.message;
   if (status >= 500) return "El servidor tuvo un problema al procesar la solicitud. Inténtalo de nuevo o contacta al administrador.";
   const validation = Object.values(body?.errors || {}).flat().join(", ");
   return validation || body?.message || STATUS_MESSAGES[status] || "No se pudo completar la operación.";
