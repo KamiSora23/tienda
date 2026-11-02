@@ -36,7 +36,6 @@ Completa las líneas marcadas con `<-- CAMBIAR`:
 | `APP_URL` y `FRONTEND_URL` | La misma dirección pública, sin `/` al final: `https://erp.tuempresa.com` o `http://IP-DEL-SERVIDOR:8080`. |
 | `APP_KEY` | Clave de cifrado. Genérala con el comando de abajo y pégala. **No la cambies después**. |
 | `DB_PASSWORD`, `DB_ROOT_PASSWORD` | Dos contraseñas largas y distintas (sin el carácter `$`). |
-| `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_FROM_ADDRESS` | Correo que envía los códigos y comprobantes. En Gmail, `MAIL_PASSWORD` es una **contraseña de aplicación** de 16 letras sin espacios ([myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords)). |
 
 Generar `APP_KEY`:
 
@@ -74,8 +73,18 @@ docker compose ps          # todos deben estar "running" / "healthy"
 La primera construcción tarda varios minutos. Luego abre `APP_URL` en el navegador:
 
 - El **administrador de la empresa** entra con su correo y contraseña.
-- El **superadministrador** entra con su correo, contraseña y el código que le llega por correo; llega
-  al *Panel de plataforma*.
+- El **superadministrador** entra con su correo, contraseña y un código de verificación. **La primera
+  vez** todavía no hay correo configurado: en la pantalla del código verás un aviso; genera el código en
+  el servidor y escríbelo:
+
+  ```bash
+  docker compose exec api php artisan user:login-code tu-correo@gmail.com
+  ```
+
+  Ya dentro, ve a **Panel de plataforma › Correo de la plataforma**, elige Gmail, pon tu correo y la
+  **contraseña de aplicación** ([myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords)),
+  pulsa *Enviar correo de prueba*, activa y guarda. Desde entonces los códigos llegan por correo. La
+  contraseña queda cifrada en la base de datos, no en archivos.
 - El portal público queda en `APP_URL/portal`.
 
 ## 6. HTTPS con dominio (recomendado)

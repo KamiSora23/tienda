@@ -35,11 +35,13 @@ class AuthController extends Controller {
         $user->update(['two_factor_code'=>hash('sha256',$code),'two_factor_expires_at'=>now()->addMinutes(self::CODE_MINUTES),'failed_login_attempts'=>0,'locked_until'=>null]);
         // Si el correo falla (contraseña de Gmail incorrecta, sin internet…), el ingreso no se cae.
         $mailer=app(\App\Services\CompanyMailer::class);$company=PlatformAccess::allows($user)?null:$user->company_id;$own=$mailer->settings($company);
-        $sent=true;try{$mailer->send($company,$user->email,'Código de verificación Deurstore',"Su código de verificación de Deurstore es {$code}. Vence en ".self::CODE_MINUTES." minutos. Si no intentaste ingresar, cambia tu contraseña.",null,$own);}catch(\Throwable $e){$sent=false;report($e);}
+        // Sin ningún correo configurado (ni de la empresa, ni de la plataforma, ni en .env) no se intenta enviar.
+        $configured=$mailer->delivers($company);
+        $sent=$configured;if($configured)try{$mailer->send($company,$user->email,'Código de verificación Deurstore',"Su código de verificación de Deurstore es {$code}. Vence en ".self::CODE_MINUTES." minutos. Si no intentaste ingresar, cambia tu contraseña.",null,$own);}catch(\Throwable $e){$sent=false;report($e);}
         // En desarrollo local, sin correo real o si el envío falló, el código se muestra en pantalla.
-        $local=app()->isLocal()&&(!$sent||!$mailer->delivers($company));
+        $local=app()->isLocal()&&!$sent;
         // Si el correo falla, igual se abre la pantalla del código: se puede pedir uno al servidor con «user:login-code».
-        return response()->json(['success'=>true,'data'=>['two_factor_required'=>true,'email'=>$user->email,'resend_in'=>self::CODE_COOLDOWN,'mail_failed'=>!$sent]+($local?['dev_code'=>$code]:[])]);
+        return response()->json(['success'=>true,'data'=>['two_factor_required'=>true,'email'=>$user->email,'resend_in'=>self::CODE_COOLDOWN,'mail_failed'=>!$sent,'mail_missing'=>!$configured]+($local?['dev_code'=>$code]:[])]);
     }
 
     /** «Reenviar código»: solo con un ingreso pendiente (contraseña ya validada en los últimos 10 minutos). */

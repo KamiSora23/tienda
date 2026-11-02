@@ -93,6 +93,20 @@ class PlatformSafeguardsTest extends TestCase
         $this->postJson('/api/v1/two-factor/resend', ['email' => 'nadie@example.test'])->assertUnprocessable();
     }
 
+    public function test_without_any_mail_configured_the_first_login_uses_a_console_code(): void
+    {
+        // Servidor recién instalado: sin correo en .env (log) ni configurado desde la app.
+        config(['mail.default' => 'log']);
+        $this->postJson('/api/v1/login', ['email' => 'super@example.test', 'password' => 'Super12345'])
+            ->assertOk()->assertJsonPath('data.mail_missing', true)->assertJsonMissingPath('data.dev_code');
+
+        $this->artisan('user:login-code', ['email' => 'super@example.test'])->assertSuccessful();
+        // Con el código de consola (aquí fijado por el test) entra y puede configurar el correo.
+        $this->super->update(['two_factor_code' => hash('sha256', '654321'), 'two_factor_expires_at' => now()->addMinutes(5)]);
+        $token = $this->postJson('/api/v1/two-factor/verify', ['email' => 'super@example.test', 'code' => '654321'])->assertOk()->json('data.token');
+        $this->getJson('/api/v1/platform/mail', ['Authorization' => "Bearer {$token}"])->assertOk();
+    }
+
     public function test_a_console_command_issues_a_fresh_code(): void
     {
         $this->artisan('user:login-code', ['email' => 'super@example.test'])->expectsOutputToContain('Código para super@example.test')->assertSuccessful();
