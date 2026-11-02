@@ -14,6 +14,8 @@ export function MailSettings({ token, notify, platform = false }: { token: strin
   const [password, setPassword] = useState("");
   const [testTo, setTestTo] = useState("");
   const [busy, setBusy] = useState<"" | "save" | "test">("");
+  const [readOnly, setReadOnly] = useState(false); // superadministrador en solo lectura dentro de la empresa
+  const blocked = (x: any) => { if (!platform && x?.status === 403) setReadOnly(true); notify(x.message); };
 
   const load = () => api(base, token).then(setS).catch((e) => notify(e.message));
   useEffect(() => { load(); }, [token]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -26,16 +28,17 @@ export function MailSettings({ token, notify, platform = false }: { token: strin
 
   const save = async (e: React.FormEvent) => {
     e.preventDefault(); setBusy("save");
-    try { const r = await api(base, token, { method: "PUT", body: JSON.stringify(payload()) }); notify(r?.message ?? "Correo guardado"); setPassword(""); await load(); } catch (x: any) { notify(x.message); } finally { setBusy(""); }
+    try { const r = await api(base, token, { method: "PUT", body: JSON.stringify(payload()) }); notify(r?.message ?? "Correo guardado"); setPassword(""); await load(); } catch (x: any) { blocked(x); } finally { setBusy(""); }
   };
   const test = async () => {
     setBusy("test");
-    try { await api(`${base}/test`, token, { method: "POST", body: JSON.stringify({ ...payload(), to: testTo || null }) }); notify("Correo de prueba enviado. Revisa la bandeja (y spam)."); await load(); } catch (x: any) { notify(x.message); await load(); } finally { setBusy(""); }
+    try { await api(`${base}/test`, token, { method: "POST", body: JSON.stringify({ ...payload(), to: testTo || null }) }); notify("Correo de prueba enviado. Revisa la bandeja (y spam)."); await load(); } catch (x: any) { blocked(x); await load(); } finally { setBusy(""); }
   };
 
   return (
     <form className="panel settings-form mail-settings" onSubmit={save}>
       <h2>{platform ? "Correo de la plataforma" : "Correo de la empresa"}</h2>
+      {readOnly && <div className="mail-tip">Este es el correo de <b>esta empresa</b> y estás en solo lectura. Si quieres configurar el correo general con el que llegan tus códigos de verificación, ve a <b>Panel de plataforma › Correo de la plataforma</b>. Para cambiar el correo de esta empresa, activa la edición en la franja de arriba.</div>}
       <p className="settings-help">{platform
         ? <>Correo general del sistema: lo usan los superadministradores y todas las empresas que no tienen correo propio (códigos de verificación, contraseñas olvidadas y comprobantes). {s.platform_from ? <>Mientras no lo actives aquí, se usa el de <code>backend/.env</code> (<b>{s.platform_from}</b>).</> : "Mientras no lo actives aquí, se usa el de backend/.env."}</>
         : <>Desde este correo se envían los comprobantes a tus clientes, los códigos de verificación y los enlaces para recuperar la contraseña de tus usuarios. {s.platform_from ? <>Mientras no lo actives, se usa el correo general de la plataforma (<b>{s.platform_from}</b>).</> : "Mientras no lo actives, se usa el correo general de la plataforma."}</>}</p>
