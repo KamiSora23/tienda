@@ -115,6 +115,41 @@ docker compose down                        # detener (los datos se conservan)
 
 > **Cuidado:** `docker compose down -v` borra los volúmenes, es decir, **toda la base de datos**.
 
+## Si no carga: «The origin has unexpectedly closed the connection»
+
+Ese mensaje lo da Cloudflare (o el túnel/proxy que tengas delante) cuando el servidor corta la
+conexión. Revisa en este orden:
+
+1. **¿Están arriba los contenedores?**
+
+   ```bash
+   docker compose ps
+   ```
+
+   Todos deben decir `running`; `api`, `web` y `proxy` además `(healthy)`. La primera vez la API tarda
+   1–3 minutos (migraciones). Si alguno dice `restarting` o `exited`, mira su error:
+
+   ```bash
+   docker compose logs --tail=80 api
+   docker compose logs --tail=80 web
+   docker compose logs --tail=80 proxy
+   ```
+
+2. **¿Responde en el propio servidor?** (cambia 8080 si usas otro `APP_PORT`)
+
+   ```bash
+   curl -I http://127.0.0.1:8080/proxy-health   # 200 = el proxy funciona
+   curl -I http://127.0.0.1:8080/up             # 200 = la API funciona
+   curl -I http://127.0.0.1:8080/               # 200 = la web funciona
+   ```
+
+3. **Cloudflare / túnel:** el destino debe ser `http://localhost:8080` (o `http://IP:8080`), **no
+   `https://`**: el contenedor `proxy` habla HTTP y el HTTPS lo pone Cloudflare. Si usas registros DNS
+   con la nube naranja (sin túnel), Cloudflare solo conecta a los puertos 80/443/8080/8443…: usa
+   `APP_PORT=80` o `8080`, y en SSL/TLS elige el modo **Flexible** (o pon Caddy con certificado y modo
+   *Full*).
+4. **Firewall del servidor:** abre el puerto (`sudo ufw allow 8080/tcp`) si entras directo por IP.
+
 ## Desarrollo local en Windows (sin Docker)
 
 Sigue funcionando como siempre con Laragon e `iniciar-deurstore.bat` (API en el puerto 8001 e
