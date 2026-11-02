@@ -29,7 +29,9 @@ final class DatabaseDump
     {
         $c = config('database.connections.'.config('database.default'));
 
-        return [['--host='.$c['host'], '--port='.$c['port'], '--user='.$c['username']], $c['database'], (string) ($c['password'] ?? '')];
+        $extra = array_values(array_filter(explode(' ', (string) config('database.dump_options'))));
+
+        return [['--host='.$c['host'], '--port='.$c['port'], '--user='.$c['username'], ...$extra], $c['database'], (string) ($c['password'] ?? '')];
     }
 
     /** Crea el archivo de respaldo. Devuelve null si salió bien o el mensaje de error. */

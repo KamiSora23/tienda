@@ -21,6 +21,8 @@ return [
     // Programas para respaldos (vacío = el de Laragon en Windows o el del PATH en Linux/Docker).
     'dump_binary' => env('DB_DUMP_BINARY'),
     'client_binary' => env('DB_CLIENT_BINARY'),
+    // Opciones extra para mysqldump/mysql, separadas por espacios (en Docker: --skip-ssl, red interna).
+    'dump_options' => env('DB_DUMP_OPTIONS', ''),
 
     /*
     |--------------------------------------------------------------------------

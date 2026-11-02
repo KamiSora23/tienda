@@ -31,7 +31,9 @@ services:
       MYSQL_PASSWORD: ${DB_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
       TZ: America/Lima
-    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
+    # mysql_native_password: el cliente de respaldos (MariaDB) no siempre admite el método por defecto de MySQL 8.4.
+    # Solo se aplica al crear la base por primera vez (volumen db_data vacío).
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci", "--mysql-native-password=ON", "--authentication-policy=mysql_native_password"]
     volumes:
       - db_data:/var/lib/mysql
     healthcheck:

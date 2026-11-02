@@ -14,6 +14,10 @@ RUN apt-get update \
  && a2enmod rewrite headers \
  && rm -rf /var/lib/apt/lists/*
 
+# Respaldos con el cliente de MariaDB que trae Debian (los nombres mysqldump/mysql no siempre existen).
+# La red entre contenedores es interna, así que se conecta sin TLS.
+ENV DB_DUMP_BINARY=mariadb-dump DB_CLIENT_BINARY=mariadb DB_DUMP_OPTIONS=--skip-ssl
+
 # Apache sirve backend/public.
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 RUN sed -ri 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \
