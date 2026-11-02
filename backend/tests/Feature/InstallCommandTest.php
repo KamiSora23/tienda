@@ -41,6 +41,27 @@ class InstallCommandTest extends TestCase
         $this->postJson('/api/v1/login', ['email' => 'plataforma@mitienda.test', 'password' => 'ClaveSegura123'])->assertJsonPath('data.two_factor_required', true);
     }
 
+    public function test_data_can_be_passed_in_one_line_and_only_passwords_are_asked(): void
+    {
+        $this->artisan('deurstore:install', ['--company' => 'MI TIENDA SAC', '--trade-name' => 'Mi Tienda', '--ruc' => '20123456789', '--admin-name' => 'Ana', '--admin-email' => 'ana@mitienda.test', '--platform-email' => 'plataforma@mitienda.test'])
+            ->expectsQuestion('Contraseña del administrador (mínimo 10 caracteres)', 'ClaveSegura1')
+            ->expectsQuestion('Contraseña del superadministrador (mínimo 12 caracteres)', 'ClaveSegura123')
+            ->assertSuccessful();
+        $this->assertSame('Mi Tienda', DB::table('companies')->value('trade_name'));
+    }
+
+    public function test_a_wrong_answer_is_asked_again_without_starting_over(): void
+    {
+        $this->artisan('deurstore:install', ['--company' => 'MI TIENDA SAC', '--trade-name' => 'Mi Tienda', '--ruc' => '123', '--admin-name' => 'Ana', '--admin-email' => 'ana@mitienda.test', '--platform-email' => 'plataforma@mitienda.test'])
+            ->expectsOutputToContain('RUC (11 dígitos) debe tener 11 dígitos')
+            ->expectsQuestion('RUC (11 dígitos)', '20123456789')
+            ->expectsQuestion('Contraseña del administrador (mínimo 10 caracteres)', 'corta')
+            ->expectsQuestion('Contraseña del administrador (mínimo 10 caracteres)', 'ClaveSegura1')
+            ->expectsQuestion('Contraseña del superadministrador (mínimo 12 caracteres)', 'ClaveSegura123')
+            ->assertSuccessful();
+        $this->assertSame('20123456789', DB::table('companies')->value('ruc'));
+    }
+
     public function test_it_does_nothing_when_companies_already_exist(): void
     {
         $this->install()->assertSuccessful();

@@ -56,8 +56,11 @@ Opción B, a mano (pregunta los datos):
 
 ```bash
 docker compose up -d --build
-docker compose exec api php artisan deurstore:install
+docker compose exec api php artisan deurstore:install   --company="MI EMPRESA SAC" --trade-name="Mi Empresa" --ruc=20123456789   --admin-name="Nombre Apellido" --admin-email=admin@miempresa.com   --platform-email=tu-correo@gmail.com
 ```
+
+Solo pregunta las dos contraseñas (ocultas). Si omites alguna opción, la pregunta; si un dato no es
+válido, vuelve a preguntar solo ese.
 
 No uses `migrate --seed` en un servidor real: crea una empresa de demostración con contraseñas públicas.
 

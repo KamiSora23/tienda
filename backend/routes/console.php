@@ -40,23 +40,45 @@ Artisan::command('mail:test {to}', function (string $to) {
 })->purpose('Envía un correo de prueba con la configuración actual');
 
 // Instalación en un servidor nuevo (sin datos de demostración): permisos, primera empresa con su
-// administrador y el superadministrador. Pregunta los datos o los toma de las variables INSTALL_*.
-Artisan::command('deurstore:install {--force : Instalar aunque ya existan empresas}', function () {
+// administrador y el superadministrador. Los datos se pasan como opciones (en una línea), se toman de
+// las variables INSTALL_* o se preguntan; si un dato no es válido, se vuelve a preguntar solo ese.
+Artisan::command('deurstore:install
+    {--company= : Razón social}
+    {--trade-name= : Nombre comercial}
+    {--ruc= : RUC de 11 dígitos}
+    {--admin-name= : Nombre del administrador}
+    {--admin-email= : Correo del administrador}
+    {--admin-password= : Contraseña del administrador (mejor no pasarla aquí: se pregunta oculta)}
+    {--platform-email= : Correo del superadministrador}
+    {--platform-password= : Contraseña del superadministrador (mejor no pasarla aquí: se pregunta oculta)}
+    {--force : Instalar aunque ya existan empresas}', function () {
     \App\Support\PermissionCatalog::ensure();
     if(DB::table('companies')->exists()&&!$this->option('force')){$this->info('Ya hay empresas registradas: solo se verificaron los permisos.');return 0;}
-    $ask=function(string $env,string $question,?string $default=null,bool $secret=false){$value=env($env);if($value!==null&&$value!=='')return $value;return $secret?$this->secret($question):$this->ask($question,$default);};
-    $data=[
-        'business_name'=>$ask('INSTALL_COMPANY_NAME','Razón social de la empresa'),
-        'trade_name'=>$ask('INSTALL_COMPANY_TRADE_NAME','Nombre comercial'),
-        'ruc'=>$ask('INSTALL_COMPANY_RUC','RUC (11 dígitos)'),
-        'admin_name'=>$ask('INSTALL_ADMIN_NAME','Nombre del administrador de la empresa'),
-        'admin_email'=>$ask('INSTALL_ADMIN_EMAIL','Correo del administrador'),
-        'admin_password'=>$ask('INSTALL_ADMIN_PASSWORD','Contraseña del administrador (mínimo 10 caracteres)',null,true),
-        'platform_email'=>$ask('INSTALL_PLATFORM_EMAIL','Correo del superadministrador de la plataforma'),
-        'platform_password'=>$ask('INSTALL_PLATFORM_PASSWORD','Contraseña del superadministrador (mínimo 12 caracteres)',null,true),
+    $fields=[
+        'business_name'=>['company','INSTALL_COMPANY_NAME','Razón social de la empresa','required|max:200',false],
+        'trade_name'=>['trade-name','INSTALL_COMPANY_TRADE_NAME','Nombre comercial','required|max:120',false],
+        'ruc'=>['ruc','INSTALL_COMPANY_RUC','RUC (11 dígitos)','required|digits:11|unique:companies,ruc',false],
+        'admin_name'=>['admin-name','INSTALL_ADMIN_NAME','Nombre del administrador de la empresa','required|max:120',false],
+        'admin_email'=>['admin-email','INSTALL_ADMIN_EMAIL','Correo del administrador','required|email|unique:users,email',false],
+        'admin_password'=>['admin-password','INSTALL_ADMIN_PASSWORD','Contraseña del administrador (mínimo 10 caracteres)','required|min:10',true],
+        'platform_email'=>['platform-email','INSTALL_PLATFORM_EMAIL','Correo del superadministrador de la plataforma','required|email|unique:users,email',false],
+        'platform_password'=>['platform-password','INSTALL_PLATFORM_PASSWORD','Contraseña del superadministrador (mínimo 12 caracteres)','required|min:12',true],
     ];
-    $v=\Illuminate\Support\Facades\Validator::make($data,['business_name'=>'required|max:200','trade_name'=>'required|max:120','ruc'=>'required|digits:11|unique:companies,ruc','admin_name'=>'required|max:120','admin_email'=>'required|email|unique:users,email','admin_password'=>'required|min:10','platform_email'=>'required|email|different:admin_email|unique:users,email','platform_password'=>'required|min:12']);
-    if($v->fails()){foreach($v->errors()->all() as $e)$this->error($e);return 1;}
+    $data=[];
+    foreach($fields as $key=>[$option,$env,$question,$rules,$secret]){
+        $value=$this->option($option);
+        if($value===null||$value==='')$value=env($env);
+        for($attempt=0;;$attempt++){
+            if(($value===null||$value==='')&&$this->input->isInteractive())$value=$secret?$this->secret($question):$this->ask($question);
+            $rule=$key==='platform_email'?$rules.'|different:admin_email':$rules;
+            $v=\Illuminate\Support\Facades\Validator::make([$key=>$value]+$data,[$key=>$rule],[],[$key=>$question]);
+            if(!$v->fails()){$data[$key]=$value;break;}
+            $this->error($v->errors()->first($key));
+            // Sin terminal interactiva (o tras varios intentos) no se puede volver a preguntar.
+            if(!$this->input->isInteractive()||$attempt>=4)return 1;
+            $value=null;
+        }
+    }
     DB::transaction(function()use($data){
         $now=now();
         $company=DB::table('companies')->insertGetId(['uuid'=>\Illuminate\Support\Str::uuid(),'business_name'=>$data['business_name'],'trade_name'=>$data['trade_name'],'ruc'=>$data['ruc'],'currency'=>'PEN','timezone'=>'America/Lima','status'=>'active','created_at'=>$now,'updated_at'=>$now]);
