@@ -92,6 +92,34 @@ Apunta el dominio (registro A) a la IP del servidor y pon `APP_URL=https://erp.t
 (y `FRONTEND_URL` igual) en `.env`; luego `docker compose up -d`. También sirven Cloudflare Tunnel o
 Nginx Proxy Manager.
 
+### Con un túnel de Cloudflare que corre en Docker
+
+Si tu `cloudflared` es un contenedor y llega a los servicios por nombre (`http://mi-app:puerto`), une
+el proxy a su red con un archivo `docker-compose.override.yml` (no se sube a GitHub):
+
+```bash
+# Red en la que está cloudflared:
+docker inspect $(docker ps -qf name=cloudflared) --format '{{range $k, $v := .NetworkSettings.Networks}}{{$k}} {{end}}'
+```
+
+```yaml
+# docker-compose.override.yml
+services:
+  proxy:
+    networks:
+      default:
+      tunel:
+        aliases:
+          - deurstore
+networks:
+  tunel:
+    external: true
+    name: NOMBRE_DE_LA_RED
+```
+
+Luego `docker compose up -d` y, en Cloudflare, la ruta con **Service URL** `http://deurstore:80`.
+Sin unir redes también sirve `http://IP-DEL-SERVIDOR:APP_PORT`.
+
 ## 7. Actualizar a una nueva versión
 
 ```bash

@@ -1,5 +1,7 @@
 # ── Secretos: nunca se suben ───────────────────────────────────────────────
 .env
+# Ajustes propios de cada servidor (por ejemplo, la red del túnel de Cloudflare).
+docker-compose.override.yml
 backend/.env
 backend/.env.backup
 backend/.env.production
