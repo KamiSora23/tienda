@@ -1,0 +1,7 @@
+# Los scripts de Docker deben tener saltos de línea de Linux aunque se editen en Windows.
+* text=auto
+*.sh text eol=lf
+docker/** text eol=lf
+docker-compose.yml text eol=lf
+.env.docker.example text eol=lf
+*.bat text eol=crlf

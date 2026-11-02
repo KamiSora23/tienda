@@ -1,0 +1,4 @@
+"use client";
+import { API } from "@/app/lib/api";
+import {useEffect,useState} from "react";
+export default function VerifyEmail(){const[message,setMessage]=useState("Verificando enlace…"),[ok,setOk]=useState(false);useEffect(()=>{const token=new URLSearchParams(location.search).get("token");fetch(`${API}/verify-email`,{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify({token})}).then(async r=>{const b=await r.json();setOk(r.ok);setMessage(b.message||"No se pudo verificar")}).catch(()=>setMessage("No se pudo conectar con el servidor"))},[]);return <main className="login-page"><section className="login-card"><div className="brand login-brand"><span className="brand-mark">D</span><div><strong>deurstore</strong><small>SEGURIDAD</small></div></div><h1>{ok?"Correo verificado":"Verificación de correo"}</h1><p>{message}</p><a className="primary verify-link" href="/">Volver al sistema</a></section></main>}

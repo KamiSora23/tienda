@@ -1,0 +1,7 @@
+<?php
+namespace App\Http\Controllers;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+class GlobalSearchController extends Controller{
+ public function __invoke(Request$r){$q=trim((string)$r->query('q'));if(mb_strlen($q)<2)return response()->json(['success'=>true,'data'=>[]]);$company=$r->user()->company_id;$like='%'.str_replace(['%','_'],['\%','\_'],$q).'%';$products=DB::table('products')->where('company_id',$company)->where(fn($x)=>$x->where('name','like',$like)->orWhere('sku','like',$like)->orWhere('barcode','like',$like))->limit(6)->get(['id','name','sku'])->map(fn($x)=>['type'=>'product','id'=>$x->id,'title'=>$x->name,'subtitle'=>$x->sku,'module'=>'Productos']);$customers=DB::table('customers')->where('company_id',$company)->where(fn($x)=>$x->where('name','like',$like)->orWhere('document_number','like',$like)->orWhere('phone','like',$like))->limit(6)->get(['id','name','document_number'])->map(fn($x)=>['type'=>'customer','id'=>$x->id,'title'=>$x->name,'subtitle'=>$x->document_number,'module'=>'Clientes']);$sales=DB::table('sales')->where('company_id',$company)->where('number','like',$like)->limit(6)->get(['id','number','total'])->map(fn($x)=>['type'=>'sale','id'=>$x->id,'title'=>$x->number,'subtitle'=>'S/ '.number_format((float)$x->total,2),'module'=>'Ventas']);return response()->json(['success'=>true,'data'=>$products->concat($customers)->concat($sales)->values()]);}
+}

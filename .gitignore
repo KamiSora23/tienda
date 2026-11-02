@@ -1,0 +1,36 @@
+# ── Secretos: nunca se suben ───────────────────────────────────────────────
+.env
+backend/.env
+backend/.env.backup
+backend/.env.production
+app/.env
+app/.env.local
+app/.env.production
+# Contiene las contraseñas de las cuentas locales de prueba.
+README-LOCAL.md
+
+# ── Dependencias y compilados (se regeneran con npm/composer) ───────────────
+backend/vendor/
+backend/node_modules/
+app/node_modules/
+app/dist/
+app/.wrangler/
+app/.npm-cache/
+app/.vinext/
+app/tsconfig.tsbuildinfo
+.composer-cache/
+
+# ── Datos generados por el sistema (respaldos, imágenes subidas, logs) ──────
+# Laravel ya ignora el contenido de backend/storage con sus propios .gitignore.
+backend/.phpunit.result.cache
+backend/.phpunit.cache/
+backend/public/storage
+
+# ── Archivos locales que no son código ─────────────────────────────────────
+.claude/
+.docx_render/
+.git-app-backup/
+deurstore-site.tar.gz
+*.docx
+.DS_Store
+Thumbs.db

@@ -1,0 +1,677 @@
+MÓDULO 1. AUTENTICACIÓN
+Inicio de sesión
+
+Recuperar contraseña
+
+Restablecer contraseña
+
+Verificación de correo
+
+Verificación en dos pasos (opcional)
+
+Seleccionar empresa
+
+Seleccionar sucursal
+
+Seleccionar caja
+
+Bloqueo por intentos fallidos
+MÓDULO 2. DASHBOARD
+Dashboard General
+
+Dashboard Administrativo
+
+Dashboard Ventas
+
+Dashboard Inventario
+
+Dashboard Compras
+
+Dashboard Caja
+
+Dashboard Financiero
+
+Dashboard IA
+
+Dashboard Portal Web
+
+Cada dashboard deberá mostrar:
+
+KPIs
+gráficos
+alertas
+accesos rápidos
+actividades recientes
+pendientes
+MÓDULO 3. EMPRESAS
+Listado empresas
+
+Crear empresa
+
+Editar empresa
+
+Ver empresa
+
+Configuración empresa
+
+Logo
+
+Datos fiscales
+
+Configuración regional
+MÓDULO 4. SUCURSALES
+Listado sucursales
+
+Nueva sucursal
+
+Editar sucursal
+
+Detalle sucursal
+
+Usuarios sucursal
+
+Almacenes
+
+Cajas
+
+Series documentos
+
+Configuración local
+MÓDULO 5. USUARIOS
+Listado usuarios
+
+Crear usuario
+
+Editar usuario
+
+Perfil usuario
+
+Cambiar contraseña
+
+Cambiar avatar
+
+Sesiones activas
+
+Historial accesos
+
+Permisos usuario
+
+Roles usuario
+MÓDULO 6. ROLES Y PERMISOS
+Listado roles
+
+Crear rol
+
+Editar rol
+
+Permisos
+
+Asignar permisos
+
+Duplicar rol
+
+Historial cambios
+MÓDULO 7. CLIENTES
+Listado clientes
+
+Nuevo cliente
+
+Editar cliente
+
+Perfil cliente
+
+Direcciones
+
+Contactos
+
+Historial compras
+
+Estado cuenta
+
+Puntos fidelidad (V2)
+
+Documentos
+
+Observaciones
+MÓDULO 8. PROVEEDORES
+Listado proveedores
+
+Nuevo proveedor
+
+Editar proveedor
+
+Detalle proveedor
+
+Direcciones
+
+Contactos
+
+Historial compras
+
+Productos proveedor
+
+Documentos
+
+Pagos realizados
+MÓDULO 9. CATEGORÍAS
+Listado categorías
+
+Nueva categoría
+
+Editar categoría
+
+Subcategorías
+
+Orden categorías
+MÓDULO 10. MARCAS
+Listado marcas
+
+Nueva marca
+
+Editar marca
+
+Logo marca
+MÓDULO 11. UNIDADES
+Listado unidades
+
+Nueva unidad
+
+Editar unidad
+
+Tipos medida
+MÓDULO 12. PRODUCTOS
+Listado productos
+
+Nuevo producto
+
+Editar producto
+
+Detalle producto
+
+Duplicar producto
+
+Productos inactivos
+
+Variantes
+
+Precios
+
+Costo
+
+Historial precios
+
+Historial costos
+
+Stock
+
+Kardex
+
+Imágenes
+
+Códigos barras
+
+Etiquetas
+
+Promociones
+
+Productos relacionados
+
+Productos similares
+
+Importar Excel
+
+Exportar Excel
+
+Imprimir etiquetas
+
+Generar códigos barras
+MÓDULO 13. ALMACENES
+Listado almacenes
+
+Nuevo almacén
+
+Editar almacén
+
+Ubicaciones internas
+
+Mapa almacén
+MÓDULO 14. INVENTARIO
+Stock actual
+
+Stock por almacén
+
+Stock por sucursal
+
+Stock valorizado
+
+Movimientos
+
+Kardex
+
+Lotes
+
+Vencimientos
+
+Conteos físicos
+
+Ajustes inventario
+
+Transferencias
+
+Reservas
+
+Alertas stock
+
+Alertas vencimiento
+
+Historial movimientos
+MÓDULO 15. COMPRAS
+Listado compras
+
+Nueva compra
+
+Editar compra
+
+Detalle compra
+
+Registrar factura
+
+Registrar boleta
+
+Registrar guía
+
+Importar compra OCR
+
+Compras pendientes
+
+Compras anuladas
+
+Pagos compra
+
+Devoluciones compra
+
+Historial compras
+MÓDULO 16. POS
+Punto de venta
+
+Buscar producto
+
+Escanear código
+
+Carrito
+
+Cambiar cantidad
+
+Venta por kilos
+
+Venta por unidades
+
+Descuentos
+
+Promociones
+
+Cliente
+
+Pago
+
+Pagos múltiples
+
+Vuelto
+
+Impresión ticket
+
+Reimprimir
+
+Cancelar venta
+
+Suspender venta
+
+Recuperar venta suspendida
+MÓDULO 17. VENTAS
+Listado ventas
+
+Detalle venta
+
+Nueva venta manual
+
+Pagos
+
+Devoluciones
+
+Anulaciones
+
+Notas crédito
+
+Notas débito
+
+Reimpresión
+
+Historial ventas
+MÓDULO 18. CAJA
+Dashboard caja
+
+Mis cajas
+
+Abrir caja
+
+Caja actual
+
+Registrar ingreso
+
+Registrar retiro
+
+Registrar depósito
+
+Registrar gasto
+
+Arqueo parcial
+
+Arqueo final
+
+Cerrar caja
+
+Historial turnos
+
+Historial movimientos
+
+Reporte diferencias
+
+Reporte arqueos
+MÓDULO 19. PROMOCIONES
+Listado promociones
+
+Nueva promoción
+
+Editar promoción
+
+Promociones activas
+
+Promociones expiradas
+
+Programación
+
+Productos promoción
+
+Categorías promoción
+
+Marcas promoción
+
+Reglas
+
+Historial aplicación
+MÓDULO 20. GASTOS
+Listado gastos
+
+Nuevo gasto
+
+Editar gasto
+
+Categorías
+
+Medidores
+
+Lecturas
+
+Historial gastos
+
+Adjuntos
+
+Reporte gastos
+MÓDULO 21. REPORTES
+Reporte ventas
+
+Reporte compras
+
+Reporte inventario
+
+Reporte utilidad
+
+Reporte caja
+
+Reporte gastos
+
+Reporte clientes
+
+Reporte proveedores
+
+Reporte productos
+
+Reporte promociones
+
+Reporte impuestos
+
+Reporte IA
+
+Programar reportes
+
+Exportar PDF
+
+Exportar Excel
+
+Exportar CSV
+MÓDULO 22. HISTORIALES
+Historial ventas
+
+Historial compras
+
+Historial precios
+
+Historial costos
+
+Historial stock
+
+Historial caja
+
+Historial usuarios
+
+Historial promociones
+
+Historial pedidos web
+MÓDULO 23. AUDITORÍA
+Auditoría general
+
+Actividad usuarios
+
+Eventos críticos
+
+Cambios precios
+
+Cambios configuración
+
+Cambios inventario
+
+Cambios permisos
+
+Cambios documentos
+
+Eventos IA
+MÓDULO 24. IA
+Dashboard IA
+
+OCR compras
+
+Resultados OCR
+
+Corrección OCR
+
+Pricing IA
+
+Productos recomendados
+
+Consultas IA
+
+Logs IA
+
+Configuración IA
+
+Consumo API
+MÓDULO 25. CONFIGURACIÓN
+Empresa
+
+Sistema
+
+Portal web
+
+Impresoras
+
+Series
+
+Correlativos
+
+Métodos pago
+
+Monedas
+
+Impuestos
+
+Backups
+
+API
+
+Correo
+
+WhatsApp
+
+SUNAT
+
+Seguridad
+
+Temas
+
+Idiomas
+
+Logs sistema
+MÓDULO 26. PORTAL PÚBLICO
+Inicio
+
+Nosotros
+
+Misión
+
+Visión
+
+Valores
+
+Catálogo
+
+Producto
+
+Promociones
+
+Categorías
+
+Marcas
+
+Buscador
+
+Carrito
+
+Checkout
+
+Seguimiento pedido
+
+Contacto
+
+Preguntas frecuentes
+
+Políticas
+
+Términos
+
+Privacidad
+MÓDULO 27. CLIENTE WEB
+Registro
+
+Inicio sesión
+
+Perfil
+
+Cambiar contraseña
+
+Direcciones
+
+Pedidos
+
+Detalle pedido
+
+Favoritos
+
+Historial
+
+Cerrar sesión
+MÓDULO 28. PEDIDOS WEB
+Listado pedidos
+
+Detalle pedido
+
+Preparación
+
+Empaque
+
+Listo
+
+Entregado
+
+Cancelado
+
+Seguimiento
+
+Historial estados
+
+Notificaciones
+MÓDULO 29. NOTIFICACIONES
+Centro notificaciones
+
+Notificaciones leídas
+
+Notificaciones pendientes
+
+Configuración
+
+Historial
+MÓDULO 30. ARCHIVOS
+Gestor documentos
+
+Gestor imágenes
+
+Adjuntos
+
+Descargas
+MÓDULO 31. RESPALDOS
+Respaldos
+
+Crear respaldo
+
+Restaurar respaldo
+
+Historial
+
+Programación automática
+MÓDULO 32. INTEGRACIONES
+SUNAT
+
+WhatsApp
+
+Correo
+
+API
+
+Webhooks
+
+Logs integraciones
+MÓDULO 33. MANTENIMIENTO
+Modo mantenimiento
+
+Limpieza cache
+
+Optimización
+
+Colas
+
+Jobs
+
+Errores
+
+Logs
+
+Estado sistema

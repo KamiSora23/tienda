@@ -1,0 +1,3 @@
+<?php
+use Illuminate\Database\Migrations\Migration;use Illuminate\Database\Schema\Blueprint;use Illuminate\Support\Facades\Schema;
+return new class extends Migration{public function up():void{Schema::create('sale_debit_notes',function(Blueprint$t){$t->id();$t->uuid('uuid')->unique();$t->foreignId('company_id')->constrained();$t->foreignId('branch_id')->constrained();$t->foreignId('sale_id')->constrained();$t->foreignId('user_id')->constrained();$t->string('number');$t->text('reason');$t->decimal('amount',14,2);$t->enum('payment_method',['cash','yape','card','transfer']);$t->string('reference')->nullable();$t->string('status')->default('issued');$t->timestamps();});}public function down():void{Schema::dropIfExists('sale_debit_notes');}};
